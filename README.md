@@ -1,24 +1,44 @@
-# README
+# `git bisect run` with rspec
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Oh no, the tests in our project are failing. Since we do not have CI,
+we don't know for how long.
 
-Things you may want to cover:
+Luckily, we can use `git bisect run` to help us find out!
 
-* Ruby version
+## What to do
 
-* System dependencies
+First, setup the project. Clone this repo, then do the regular rails
+and database setup.
+Afterwards, check the tests:
 
-* Configuration
+`rspec spec/models/user_spec.rb` – they fail.
 
-* Database creation
+While we're here, we can already initiat `git bisect`:
 
-* Database initialization
+```
+git bisect start
+git bisect bad
+```
 
-* How to run the test suite
+Go back to a commit when they were working. The one where they were
+inctroduced looks promising:
 
-* Services (job queues, cache servers, search engines, etc.)
+```
+* 747dd55 - Add new test case (15 minutes ago) <Christian Poplawski>
+```
 
-* Deployment instructions
+so: `git chekcout 747dd55`
 
-* ...
+After verifying tests are working here, we can mark this as good:
+
+```
+git bisect good
+```
+
+Now let git bisect find out when the test suite started failing:
+
+```
+git bisect run rspec spec/models/user_spec.rb
+```
+
+That's it.
